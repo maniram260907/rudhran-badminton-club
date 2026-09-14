@@ -1,0 +1,25 @@
+// use prisma-next
+
+model Member {
+  id            Int      @id @default(autoincrement())
+  fullName      String
+  mobileNumber  String   @unique
+  email         String?
+  batch         String
+  passwordHash  String
+  feeAmount     Int?
+  paymentStatus    String   @default("PENDING")
+  paymentSubmitted Boolean  @default(false)
+  isActive         Boolean  @default(false)
+  createdAt     String
+  updatedAt     String
+}
+
+model Admin {
+  id           Int      @id @default(autoincrement())
+  fullName     String
+  mobileNumber String   @unique
+  passwordHash String
+  createdAt    String
+  updatedAt    String
+}
