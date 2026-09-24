@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import bcrypt from "bcryptjs";
 import { db } from "@/prisma/db";
 
 export async function POST(request: Request) {
@@ -22,6 +23,16 @@ export async function POST(request: Request) {
       );
     }
 
+    if (password.length < 6) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Password must be at least 6 characters.",
+        },
+        { status: 400 }
+      );
+    }
+
     const existingAdmin = await db.orm.public.Admin.first({
       mobileNumber,
     });
@@ -37,12 +48,15 @@ export async function POST(request: Request) {
       );
     }
 
+    // Hash the password before storing it
+    const hashedPassword = await bcrypt.hash(password, 12);
+
     const now = new Date().toISOString();
 
     const admin = await db.orm.public.Admin.create({
       fullName,
       mobileNumber,
-      passwordHash: password,
+      passwordHash: hashedPassword,
       createdAt: now,
       updatedAt: now,
     });

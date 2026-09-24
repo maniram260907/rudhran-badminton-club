@@ -1,34 +1,61 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
+import bcrypt from "bcryptjs";
 import { db } from "@/prisma/db";
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
 
-    const { adminId } = body;
+    const adminId = Number(body.adminId);
+    const password = String(body.password || "");
 
-    if (!adminId) {
+    if (!adminId || !password) {
       return NextResponse.json(
         {
           success: false,
-          message: "Admin ID is required.",
+          message: "Admin ID and password are required.",
+        },
+        { status: 400 }
+      );
+    }
+
+    if (!Number.isInteger(adminId)) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Invalid admin ID.",
         },
         { status: 400 }
       );
     }
 
     const admin = await db.orm.public.Admin.first({
-      id: Number(adminId),
+      id: adminId,
     });
 
     if (!admin) {
       return NextResponse.json(
         {
           success: false,
-          message: "Admin not found.",
+          message: "Invalid authentication details.",
         },
-        { status: 404 }
+        { status: 401 }
+      );
+    }
+
+    const passwordValid = await bcrypt.compare(
+      password,
+      admin.passwordHash
+    );
+
+    if (!passwordValid) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Invalid authentication details.",
+        },
+        { status: 401 }
       );
     }
 

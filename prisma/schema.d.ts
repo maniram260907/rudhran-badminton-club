@@ -33,7 +33,7 @@ import type {
 } from '@prisma/orm-postgres/contract/types';
 
 export type StorageHash =
-  StorageHashBase<'9aac4217068778df0dfb6d7a4b8b2b960c529a9c7eece20461f0856c6bf7f96c'>;
+  StorageHashBase<'2d470ae833cf0a4f9367c89f8fe0852263a1241da59c6a41df6923c1f0ba50a2'>;
 export type ExecutionHash = ExecutionHashBase<string>;
 export type ProfileHash =
   ProfileHashBase<'3916f444a8a17ad749191acf9e08dad97d1a327b88c2f1d45d12f240296aa8b2'>;
@@ -258,6 +258,7 @@ export type FieldOutputTypes = {
       readonly feeAmount: CodecTypes['pg/int4@1']['output'] | null;
       readonly paymentStatus: CodecTypes['pg/text@1']['output'];
       readonly paymentSubmitted: CodecTypes['pg/bool@1']['output'];
+      readonly paymentReference: CodecTypes['pg/text@1']['output'] | null;
       readonly isActive: CodecTypes['pg/bool@1']['output'];
       readonly createdAt: CodecTypes['pg/text@1']['output'];
       readonly updatedAt: CodecTypes['pg/text@1']['output'];
@@ -284,6 +285,7 @@ export type FieldInputTypes = {
       readonly feeAmount: CodecTypes['pg/int4@1']['input'] | null;
       readonly paymentStatus: CodecTypes['pg/text@1']['input'];
       readonly paymentSubmitted: CodecTypes['pg/bool@1']['input'];
+      readonly paymentReference: CodecTypes['pg/text@1']['input'] | null;
       readonly isActive: CodecTypes['pg/bool@1']['input'];
       readonly createdAt: CodecTypes['pg/text@1']['input'];
       readonly updatedAt: CodecTypes['pg/text@1']['input'];
@@ -310,6 +312,7 @@ export type StorageColumnTypes = {
       readonly isActive: CodecTypes['pg/bool@1']['output'];
       readonly mobileNumber: CodecTypes['pg/text@1']['output'];
       readonly passwordHash: CodecTypes['pg/text@1']['output'];
+      readonly paymentReference: CodecTypes['pg/text@1']['output'] | null;
       readonly paymentStatus: CodecTypes['pg/text@1']['output'];
       readonly paymentSubmitted: CodecTypes['pg/bool@1']['output'];
       readonly updatedAt: CodecTypes['pg/text@1']['output'];
@@ -336,6 +339,7 @@ export type StorageColumnInputTypes = {
       readonly isActive: CodecTypes['pg/bool@1']['input'];
       readonly mobileNumber: CodecTypes['pg/text@1']['input'];
       readonly passwordHash: CodecTypes['pg/text@1']['input'];
+      readonly paymentReference: CodecTypes['pg/text@1']['input'] | null;
       readonly paymentStatus: CodecTypes['pg/text@1']['input'];
       readonly paymentSubmitted: CodecTypes['pg/bool@1']['input'];
       readonly updatedAt: CodecTypes['pg/text@1']['input'];
@@ -461,6 +465,11 @@ type ContractBase = Omit<
                     readonly value: DefaultLiteralValue<'pg/bool@1', false>;
                   };
                 };
+                readonly paymentReference: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                };
                 readonly isActive: {
                   readonly nativeType: 'bool';
                   readonly codecId: 'pg/bool@1';
@@ -583,6 +592,10 @@ type ContractBase = Omit<
                 readonly nullable: false;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/bool@1' };
               };
+              readonly paymentReference: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
               readonly isActive: {
                 readonly nullable: false;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/bool@1' };
@@ -610,6 +623,7 @@ type ContractBase = Omit<
                 readonly feeAmount: { readonly column: 'feeAmount' };
                 readonly paymentStatus: { readonly column: 'paymentStatus' };
                 readonly paymentSubmitted: { readonly column: 'paymentSubmitted' };
+                readonly paymentReference: { readonly column: 'paymentReference' };
                 readonly isActive: { readonly column: 'isActive' };
                 readonly createdAt: { readonly column: 'createdAt' };
                 readonly updatedAt: { readonly column: 'updatedAt' };

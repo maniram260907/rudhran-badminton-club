@@ -1,11 +1,13 @@
 import { NextResponse } from "next/server";
+import bcrypt from "bcryptjs";
 import { db } from "@/prisma/db";
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
 
-    const { mobileNumber, password } = body;
+    const mobileNumber = String(body.mobileNumber || "").trim();
+    const password = String(body.password || "");
 
     if (!mobileNumber || !password) {
       return NextResponse.json(
@@ -31,7 +33,33 @@ export async function POST(request: Request) {
       );
     }
 
-    if (admin.passwordHash !== password) {
+    let passwordValid = false;
+
+    // Check bcrypt password first
+    try {
+      passwordValid = await bcrypt.compare(
+        password,
+        admin.passwordHash
+      );
+    } catch {
+      passwordValid = false;
+    }
+
+    // Temporary migration support for admins
+    // whose password is still stored as plain text.
+    if (!passwordValid && admin.passwordHash === password) {
+      const hashedPassword = await bcrypt.hash(password, 12);
+
+      await db.orm.public.Admin
+        .where({ id: admin.id })
+        .update({
+          passwordHash: hashedPassword,
+        });
+
+      passwordValid = true;
+    }
+
+    if (!passwordValid) {
       return NextResponse.json(
         {
           success: false,

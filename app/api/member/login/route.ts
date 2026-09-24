@@ -1,4 +1,6 @@
 import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
+import bcrypt from "bcryptjs";
 import postgres from "@prisma/orm-postgres/runtime";
 import type { Contract } from "../../../../prisma/schema.d";
 import contractJson from "../../../../prisma/schema.json" with { type: "json" };
@@ -41,7 +43,33 @@ export async function POST(request: Request) {
       );
     }
 
-    if (member.passwordHash !== password) {
+    let passwordValid = false;
+
+    // Check bcrypt password first
+    try {
+      passwordValid = await bcrypt.compare(
+        password,
+        member.passwordHash
+      );
+    } catch {
+      passwordValid = false;
+    }
+
+    // Temporary migration support for members
+    // whose password is still stored as plain text.
+    if (!passwordValid && member.passwordHash === password) {
+      const hashedPassword = await bcrypt.hash(password, 12);
+
+      await db.orm.public.Member
+        .where({ id: member.id })
+        .update({
+          passwordHash: hashedPassword,
+        });
+
+      passwordValid = true;
+    }
+
+    if (!passwordValid) {
       return NextResponse.json(
         {
           success: false,
@@ -51,14 +79,29 @@ export async function POST(request: Request) {
       );
     }
 
-    const { passwordHash, ...safeMember } = member;
-void passwordHash;
+    const safeMember = Object.fromEntries(
+      Object.entries(member).filter(
+        ([key]) => key !== "passwordHash"
+      )
+    );
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       success: true,
       message: "Login successful.",
       member: safeMember,
     });
+
+    const cookieStore = await cookies();
+
+    cookieStore.set("member_session", String(member.id), {
+      httpOnly: true,
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+      path: "/",
+      maxAge: 60 * 60 * 24 * 7,
+    });
+
+    return response;
   } catch (error) {
     console.error("Member login failed:", error);
 

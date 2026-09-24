@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import bcrypt from "bcryptjs";
 import { db } from "@/prisma/db";
 
 export async function POST(request: Request) {
@@ -14,7 +15,6 @@ export async function POST(request: Request) {
       password,
     } = body;
 
-    // Check required fields
     if (
       !fullName ||
       !mobileNumber ||
@@ -31,7 +31,6 @@ export async function POST(request: Request) {
       );
     }
 
-    // Convert fee amount to a number
     const amount = Number(feeAmount);
 
     if (isNaN(amount) || amount <= 0) {
@@ -44,7 +43,6 @@ export async function POST(request: Request) {
       );
     }
 
-    // Check whether mobile number already exists
     const existingMember = await db.orm.public.Member.first({
       mobileNumber,
     });
@@ -59,7 +57,8 @@ export async function POST(request: Request) {
       );
     }
 
-    // Create new member
+    const hashedPassword = await bcrypt.hash(password, 12);
+
     const now = new Date().toISOString();
 
     const member = await db.orm.public.Member.create({
@@ -68,14 +67,19 @@ export async function POST(request: Request) {
       email: email || null,
       batch,
       feeAmount: amount,
-      passwordHash: password,
+      passwordHash: hashedPassword,
+
       paymentStatus: "PENDING",
+      paymentSubmitted: false,
+      paymentReference: null,
+
       isActive: false,
+
       createdAt: now,
       updatedAt: now,
     });
 
-    return NextResponse.json(
+    const response = NextResponse.json(
       {
         success: true,
         message: "Registration successful.",
@@ -83,6 +87,17 @@ export async function POST(request: Request) {
       },
       { status: 201 }
     );
+
+    // Automatically log the newly registered member in
+    response.cookies.set("member_session", String(member.id), {
+      httpOnly: true,
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+      path: "/",
+      maxAge: 60 * 60 * 24 * 7,
+    });
+
+    return response;
   } catch (error) {
     console.error("Registration error:", error);
 

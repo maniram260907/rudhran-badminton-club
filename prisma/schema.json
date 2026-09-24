@@ -153,6 +153,13 @@
                   "kind": "scalar"
                 }
               },
+              "paymentReference": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
               "paymentStatus": {
                 "nullable": false,
                 "type": {
@@ -204,6 +211,9 @@
                 },
                 "passwordHash": {
                   "column": "passwordHash"
+                },
+                "paymentReference": {
+                  "column": "paymentReference"
                 },
                 "paymentStatus": {
                   "column": "paymentStatus"
@@ -335,6 +345,11 @@
                   "nativeType": "text",
                   "nullable": false
                 },
+                "paymentReference": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
                 "paymentStatus": {
                   "codecId": "pg/text@1",
                   "default": {
@@ -380,7 +395,7 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "9aac4217068778df0dfb6d7a4b8b2b960c529a9c7eece20461f0856c6bf7f96c"
+    "storageHash": "2d470ae833cf0a4f9367c89f8fe0852263a1241da59c6a41df6923c1f0ba50a2"
   },
   "capabilities": {
     "postgres": {
