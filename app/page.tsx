@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 
 type Member = {
   id: number;
@@ -126,7 +127,7 @@ export default function Home() {
       {/* NAVBAR */}
       <header className="sticky top-0 z-50 border-b border-[#DDE3DC] bg-[#F5F6F3]/95 backdrop-blur">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-4 sm:px-8">
-          <a href="/" className="flex items-center gap-3">
+          <Link href="/" className="flex items-center gap-3">
             <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#3F7D58] text-xl text-white shadow-sm">
               🏸
             </div>
@@ -139,7 +140,7 @@ export default function Home() {
                 BADMINTON CLUB
               </p>
             </div>
-          </a>
+          </Link>
 
           <nav className="hidden items-center gap-7 md:flex">
             <a

@@ -73,7 +73,7 @@ export default function PaymentManagement() {
 
   async function markAsPaid(memberId: number, memberName: string) {
     try {
-      const response = await fetch("/api/admin/members", {
+      const response = await fetch("/api/members", {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",

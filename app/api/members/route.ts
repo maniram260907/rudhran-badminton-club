@@ -146,21 +146,14 @@ export async function PATCH(request: Request) {
       );
     }
 
-    if (!member.paymentSubmitted) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: "Payment has not been submitted by this member.",
-        },
-        { status: 400 }
-      );
-    }
-
     await db.orm.public.Member
       .where({ id: memberId })
       .update({
         paymentStatus: "PAID",
+        paymentSubmitted: true,
+        paymentReference: member.paymentReference || "OFFLINE / ADMIN VERIFIED",
         isActive: true,
+        updatedAt: new Date().toISOString(),
       });
 
     const updatedMembers = await db.orm.public.Member

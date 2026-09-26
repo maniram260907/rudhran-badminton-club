@@ -2,9 +2,9 @@
 
 import Link from "next/link";
 import { useSearchParams, useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, Suspense } from "react";
 
-export default function VerifyCode() {
+function VerifyCodeForm() {
   const searchParams = useSearchParams();
   const router = useRouter();
 
@@ -123,5 +123,22 @@ export default function VerifyCode() {
         </div>
       </div>
     </main>
+  );
+}
+
+export default function VerifyCode() {
+  return (
+    <Suspense
+      fallback={
+        <main className="min-h-screen bg-slate-950 px-6 py-12 text-white">
+          <div className="mx-auto w-full max-w-md text-center">
+            <div className="text-6xl">🔑</div>
+            <p className="mt-4 text-slate-400">Loading...</p>
+          </div>
+        </main>
+      }
+    >
+      <VerifyCodeForm />
+    </Suspense>
   );
 }

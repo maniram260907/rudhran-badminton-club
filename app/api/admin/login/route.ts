@@ -69,7 +69,7 @@ export async function POST(request: Request) {
       );
     }
 
-    return NextResponse.json(
+    const response = NextResponse.json(
       {
         success: true,
         message: "Admin login successful.",
@@ -81,6 +81,16 @@ export async function POST(request: Request) {
       },
       { status: 200 }
     );
+
+    response.cookies.set("admin_session", String(admin.id), {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/",
+      maxAge: 60 * 60 * 24,
+    });
+
+    return response;
   } catch (error) {
     console.error("Admin login error:", error);
 

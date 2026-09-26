@@ -12,6 +12,14 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Generated Prisma artifacts and migrations:
+    "prisma/schema.d.ts",
+    "migrations/**",
+    // IDE agent and skill configuration directories:
+    ".agents/**",
+    ".claude/**",
+    ".cursor/**",
+    ".devin/**",
   ]),
 ]);
 
